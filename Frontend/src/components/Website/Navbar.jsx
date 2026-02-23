@@ -122,7 +122,7 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Nav */}
-      <div className="hidden md:flex items-center gap-10">
+      {/* <div className="hidden md:flex items-center gap-10">
         {navItems.map((item, index) => (
           <div
             key={item}
@@ -141,7 +141,7 @@ export default function Navbar() {
             <span className="absolute left-0 -bottom-2 h-[2px] bg-lime-400 w-0 group-hover:w-full transition-all duration-300"></span>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* CTA */}
       <div

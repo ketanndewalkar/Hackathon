@@ -15,7 +15,6 @@ export default function Layout({ children }) {
       />
 
       <div className="flex-1 flex flex-col">
-        <Navbar setSidebarOpen={setSidebarOpen} />
         <Main><Outlet/></Main>
       </div>
 
