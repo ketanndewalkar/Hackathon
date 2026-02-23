@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   return (
     <>
@@ -23,10 +25,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         </div>
 
         <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-          <SidebarItem label="Dashboard" />
-          <SidebarItem label="Analytics" />
-          <SidebarItem label="Prediction" />
-          <SidebarItem label="Tanker Allocation" />
+          <SidebarItem label="Dashboard" to="/dashboard"/>
+          <SidebarItem label="Analytics" to="/dashboard/risk-analysis"/>
+          <SidebarItem label="Prediction" to="/dashboard/prediction"/>
+          <SidebarItem label="Tanker Allocation" to="/dashboard/tanker-allocation"/>
           <SidebarItem label="Reports" />
           <SidebarItem label="Settings" />
         </nav>
@@ -35,10 +37,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   );
 }
 
-function SidebarItem({ label }) {
+function SidebarItem({ label,to }) {
   return (
-    <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-blue-800 transition">
+    <NavLink to={to} className="block w-full text-left px-4 py-2 rounded-lg hover:bg-blue-800 transition">
       {label}
-    </button>
+    </NavLink>
   );
 }
