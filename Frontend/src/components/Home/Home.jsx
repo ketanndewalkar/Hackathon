@@ -1,9 +1,18 @@
-import React from 'react'
+import React from "react";
+import Navbar from "../Website/Navbar";
+import HeroSection from "../Website/HeroSection";
+import ImpactBar from "../Website/ImpactBar";
 
 const Home = () => {
   return (
-    <div>Home</div>
-  )
-}
+    <>
+      <div className="w-full h-fit overflow-x-hidden">
+        <Navbar/>
+        <HeroSection/>
+        <ImpactBar/>
+      </div>
+    </>
+  );
+};
 
-export default Home
+export default Home;

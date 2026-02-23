@@ -1,54 +1,72 @@
-import { SlidersHorizontal, RefreshCcw } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { SlidersHorizontal, RefreshCcw, AlertTriangle, Truck, Activity } from "lucide-react";
+import { useState } from "react";
+
+const STORAGE_KEY = "mock_villages";
 
 export default function Prediction() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const fetchPrediction = async () => {
+  const [villages, setVillages] = useState(() => {
     try {
-      setLoading(true);
-
-      const response = await axios.get(
-        "http://localhost:5500/api/prediction"
-      );
-
-      setData(response.data);
-    } catch (error) {
-      console.error("Error fetching prediction data:", error);
-    } finally {
-      setLoading(false);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
     }
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const fetchPrediction = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      setVillages(stored ? JSON.parse(stored) : []);
+      setLoading(false);
+    }, 500);
   };
 
-  useEffect(() => {
-    fetchPrediction();
-  }, []);
+  const atRisk = villages.filter(
+    v => v.riskLevel === "HIGH" || v.riskLevel === "CRITICAL"
+  );
+
+  const highRiskOnly = villages.filter(v => v.riskLevel === "HIGH");
+  const criticalOnly = villages.filter(v => v.riskLevel === "CRITICAL");
+
+  const tankerForecast = atRisk.length * 2;
+
+  const predictedRisk =
+    villages.length > 0
+      ? ((atRisk.length / villages.length) * 100).toFixed(0)
+      : "0";
+
+  const safeVillages = villages.length - atRisk.length;
+
+  const dangerLevel =
+    predictedRisk > 70
+      ? "SEVERE"
+      : predictedRisk > 40
+      ? "ELEVATED"
+      : "STABLE";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Predictive Drought Risk & Early Warning
+          <h1 className="text-3xl font-semibold text-gray-900">
+            Predictive Drought Risk Console
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            AI-based forecasting of emerging drought stress and optimized tanker demand planning.
+            Real-time forecast modeling for proactive water crisis mitigation.
           </p>
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm">
-            <SlidersHorizontal className="w-4 h-4" />
-            Model Parameters
-          </button>
 
           <button
             onClick={fetchPrediction}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-800 text-white rounded-lg text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-green-800 text-white rounded-lg text-sm"
           >
             <RefreshCcw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             Run Fresh Forecast
@@ -56,138 +74,133 @@ export default function Prediction() {
         </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* FORECAST INTENSITY BANNER */}
+      <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-gray-200 rounded-xl p-6">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className="text-lg font-semibold">30-Day Drought Projection</h3>
+            <p className="text-sm text-gray-600">
+              Overall Regional Risk Level: 
+              <span className="ml-2 font-semibold text-red-600">
+                {dangerLevel}
+              </span>
+            </p>
+          </div>
+          <Activity className="text-red-500" />
+        </div>
+
+        <div className="w-full bg-gray-200 rounded-full h-4">
+          <div
+            className="bg-red-500 h-4 rounded-full transition-all duration-500"
+            style={{ width: `${predictedRisk}%` }}
+          ></div>
+        </div>
+
+        <div className="mt-3 text-sm text-gray-600">
+          {predictedRisk}% of monitored villages show elevated stress.
+        </div>
+      </div>
+
+      {/* KPI GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {loading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
-        ) : (
-          <>
-            <StatCard
-              title="Predicted Drought Risk (Next 30 Days)"
-              value={data?.predictedRisk ?? "68%"}
-              accent="orange"
-            />
-            <StatCard
-              title="Villages at Risk (Within 15 Days)"
-              value={data?.villagesAtRisk ?? "5 New"}
-              accent="red"
-            />
-            <StatCard
-              title="Tanker Demand Forecast"
-              value={data?.tankerForecast ?? "24"}
-              accent="green"
-            />
-            <StatCard
-              title="AI Confidence Score"
-              value={data?.confidence ?? "87%"}
-              accent="blue"
-            />
-          </>
-        )}
+
+        <StatCard
+          icon={<AlertTriangle />}
+          title="Predicted Drought Risk"
+          value={`${predictedRisk}%`}
+        />
+
+        <StatCard
+          icon={<AlertTriangle />}
+          title="Villages at Immediate Risk"
+          value={atRisk.length}
+        />
+
+        <StatCard
+          icon={<Truck />}
+          title="Tanker Demand Forecast"
+          value={tankerForecast}
+        />
+
+        <StatCard
+          icon={<Activity />}
+          title="Safe Villages"
+          value={safeVillages}
+        />
+
       </div>
 
-      {/* Forecast + Alerts */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      {/* RISK BREAKDOWN SECTION */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-        <div className="xl:col-span-2 bg-white rounded-xl border p-6">
-          <h2 className="text-sm font-semibold mb-4">
-            15–30 Day Drought Risk Forecast
-          </h2>
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="font-semibold mb-4">Risk Distribution Breakdown</h3>
 
-          {loading ? (
-            <SkeletonBox height="h-72" />
-          ) : (
-            <div className="h-72 border border-dashed rounded-lg flex items-center justify-center text-gray-400 text-sm">
-              Line Graph Placeholder
-            </div>
-          )}
+          <RiskBar label="Critical" value={criticalOnly.length} color="bg-red-600" />
+          <RiskBar label="High" value={highRiskOnly.length} color="bg-orange-500" />
+          <RiskBar label="Safe" value={safeVillages} color="bg-green-500" />
+
         </div>
 
-        <div className="bg-white rounded-xl border p-6 space-y-4">
-          <h2 className="text-sm font-semibold">Early Warning Signals</h2>
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="font-semibold mb-4">High Priority Villages</h3>
 
-          {loading ? (
-            <>
-              <SkeletonWarning />
-              <SkeletonWarning />
-            </>
+          {atRisk.length === 0 ? (
+            <p className="text-sm text-gray-400">No high-risk villages detected.</p>
           ) : (
-            <>
-              <WarningCard
-                village={data?.alerts?.[0]?.village ?? "Khandapur"}
-                risk={data?.alerts?.[0]?.risk ?? "+42%"}
-              />
-              <WarningCard
-                village={data?.alerts?.[1]?.village ?? "Shirval"}
-                risk={data?.alerts?.[1]?.risk ?? "+35%"}
-              />
-            </>
+            atRisk.map(v => (
+              <div key={v.id} className=" py-2 flex justify-between text-sm">
+                <span>{v.name}</span>
+                <span className="text-red-600 font-medium">
+                  {v.riskLevel}
+                </span>
+              </div>
+            ))
           )}
+
         </div>
+      </div>
 
+      {/* IMPACT SUMMARY */}
+      <div className="bg-green-50 border border-gray-200-l-4 border border-gray-200-green-700 p-5 rounded-lg text-sm">
+        <strong>AI Strategic Insight:</strong> If intervention is delayed,
+        {atRisk.length} villages may require emergency water logistics.
+        Immediate tanker mobilization of approximately {tankerForecast} units
+        is recommended.
       </div>
 
     </div>
   );
 }
 
-function StatCard({ title, value, accent }) {
-  const colors = {
-    red: "border-l-red-500",
-    orange: "border-l-orange-500",
-    green: "border-l-green-500",
-    blue: "border-l-blue-500",
-  };
 
-  return (
-    <div className={`bg-white border border-gray-200 border-l-4 ${colors[accent]} rounded-xl p-6`}>
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-bold mt-3">{value}</p>
-    </div>
-  );
-}
+/* COMPONENTS */
 
-function WarningCard({ village, risk }) {
+function StatCard({ icon, title, value }) {
   return (
-    <div className="border border-gray-200 rounded-lg p-4">
-      <div className="flex justify-between mb-2">
-        <h3 className="font-medium">{village}</h3>
-        <span className="text-red-600 text-sm font-semibold">
-          {risk} Risk
-        </span>
+    <div className="bg-white border border-gray-200 rounded-xl p-6 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-500">{title}</p>
+        <p className="text-2xl font-bold mt-2">{value}</p>
       </div>
-      <p className="text-sm text-gray-500">
-        Action: Pre-position tanker
-      </p>
+      <div className="text-gray-600">{icon}</div>
     </div>
   );
 }
 
-function SkeletonCard() {
+function RiskBar({ label, value, color }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-40 mb-4"></div>
-      <div className="h-8 bg-gray-300 rounded w-24"></div>
-    </div>
-  );
-}
-
-function SkeletonBox({ height }) {
-  return (
-    <div className={`bg-gray-100 rounded-lg ${height} animate-pulse`} />
-  );
-}
-
-function SkeletonWarning() {
-  return (
-    <div className="border border-gray-200 rounded-lg p-4 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
-      <div className="h-3 bg-gray-200 rounded w-20"></div>
+    <div className="mb-4">
+      <div className="flex justify-between text-sm mb-1">
+        <span>{label}</span>
+        <span>{value}</span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-3">
+        <div
+          className={`${color} h-3 rounded-full transition-all duration-500`}
+          style={{ width: `${value * 10}px` }}
+        ></div>
+      </div>
     </div>
   );
 }
