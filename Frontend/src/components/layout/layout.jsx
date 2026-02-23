@@ -2,7 +2,7 @@ import { useState } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 import Main from "../Main/main";
-
+import { Outlet } from "react-router-dom";
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -16,7 +16,7 @@ export default function Layout({ children }) {
 
       <div className="flex-1 flex flex-col">
         <Navbar setSidebarOpen={setSidebarOpen} />
-        <Main>{children}</Main>
+        <Main><Outlet/></Main>
       </div>
 
     </div>

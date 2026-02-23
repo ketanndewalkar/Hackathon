@@ -11,7 +11,7 @@ export default function Navbar({ setSidebarOpen }) {
       </button>
 
       <h1 className="text-lg font-semibold text-gray-800">
-        Page Title
+        
       </h1>
 
       <div className="flex items-center space-x-4">
