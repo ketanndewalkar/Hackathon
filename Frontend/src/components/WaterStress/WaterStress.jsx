@@ -51,11 +51,6 @@ export default function WaterStress() {
             Consolidated assessment of groundwater vulnerability.
           </p>
         </div>
-
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-neutral-200 rounded-lg text-sm shadow-sm hover:bg-neutral-50">
-          <Download className="w-4 h-4" />
-          Export Assessment
-        </button>
       </div>
 
       {/* OVERVIEW PANEL */}

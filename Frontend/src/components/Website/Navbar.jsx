@@ -104,7 +104,7 @@ export default function Navbar() {
       className="fixed top-0 left-0 w-full bg-[#0B3D2E] px-6 md:px-30 py-2 flex items-center justify-between z-50"
     >
       {/* Logo */}
-      <div ref={logoRef} className="flex items-center gap-3">
+      <div ref={logoRef} className="flex items-center">
         <img
           src="./logo.png"
           alt="Logo"
@@ -116,6 +116,9 @@ export default function Navbar() {
       object-contain
     "
         />
+        <h1 className="text-white font-bold">
+            JalSaksham
+        </h1>
       </div>
 
       {/* Desktop Nav */}

@@ -50,9 +50,22 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         transition-transform duration-300
         md:translate-x-0 md:static md:flex md:flex-col`}
       >
-        <div className="h-16 flex items-center justify-center font-semibold text-lg border-b border-green-700">
-          JalSaksham
-        </div>
+        <div className="flex items-center pt-2">
+        <img
+          src="./logo.png"
+          alt="Logo"
+          className="
+      h-12 
+      sm:h-9 
+      md:h-15 
+      w-auto 
+      object-contain
+    "
+        />
+        <h1 className="text-white font-bold">
+            JalSaksham
+        </h1>
+      </div>
 
         <nav className="flex-1 overflow-y-auto p-4 space-y-2">
 

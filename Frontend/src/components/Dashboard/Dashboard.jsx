@@ -83,22 +83,22 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 p-8 space-y-10">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-8 space-y-12">
 
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold text-neutral-900">
-            Water Governance Dashboard
+          <h1 className="text-3xl font-semibold text-slate-900">
+            Water Governance Command Center
           </h1>
-          <p className="text-sm text-neutral-500 mt-2">
-            Real-time drought intelligence & operational monitoring.
+          <p className="text-sm text-slate-500 mt-2">
+            AI-assisted drought intelligence and operational oversight.
           </p>
         </div>
 
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white rounded-full text-sm shadow-sm hover:bg-neutral-800 transition"
+          className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-full text-sm shadow-md hover:bg-teal-700 transition"
         >
           <Plus className="w-4 h-4" />
           Add Village
@@ -106,100 +106,104 @@ export default function Dashboard() {
       </div>
 
       {/* KPI GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
 
-        <InteractiveCard
+        <KpiCard
           title="Total Villages"
           value={villageList.length}
           icon={<Building2 />}
-          percentage={100}
+          accent="blue"
         />
 
-        <InteractiveCard
-          title="Risk Villages"
+        <KpiCard
+          title="At Risk"
           value={riskVillagesCount}
           icon={<AlertTriangle />}
-          percentage={
-            villageList.length
-              ? (riskVillagesCount / villageList.length) * 100
-              : 0
-          }
+          accent="red"
         />
 
-        <InteractiveCard
-          title="Available Tankers"
+        <KpiCard
+          title="Tankers Available"
           value="18"
           icon={<Truck />}
-          percentage={75}
+          accent="emerald"
         />
 
-        <InteractiveCard
+        <KpiCard
           title="Active Alerts"
           value={riskVillagesCount + 3}
           icon={<Droplets />}
-          percentage={60}
+          accent="amber"
         />
+
       </div>
 
-      {/* VISUAL BREAKDOWN SECTION */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      {/* VISUAL SECTION */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
 
-        {/* RISK DISTRIBUTION */}
-        <div className="bg-white border border-neutral-200 rounded-3xl p-8 shadow-sm">
+        <div className="bg-white/70 backdrop-blur-lg border border-slate-200 rounded-3xl p-8 shadow-lg">
 
-          <h2 className="text-lg font-medium text-neutral-900 mb-6">
-            Risk Distribution Overview
+          <h2 className="text-lg font-medium text-slate-900 mb-8">
+            Risk Distribution
           </h2>
 
-          <ProgressBar
+          <SoftProgress
             label="High / Critical"
             value={riskVillagesCount}
             total={villageList.length}
+            color="bg-red-500"
           />
 
-          <ProgressBar
+          <SoftProgress
             label="Safe / Moderate"
             value={safeCount}
             total={villageList.length}
+            color="bg-emerald-500"
           />
         </div>
 
-        {/* ALERT FEED */}
-        <div className="bg-white border border-neutral-200 rounded-3xl p-8 shadow-sm">
+        <div className="bg-white/70 backdrop-blur-lg border border-slate-200 rounded-3xl p-8 shadow-lg">
 
-          <h2 className="text-lg font-medium text-neutral-900 mb-6">
-            Recent Stress Alerts
+          <h2 className="text-lg font-medium text-slate-900 mb-8">
+            Live Alert Stream
           </h2>
 
           {villageList.length === 0 ? (
-            <p className="text-sm text-neutral-400">
-              No alerts available.
+            <p className="text-sm text-slate-400">
+              No stress signals detected.
             </p>
           ) : (
-            <div className="space-y-4 max-h-72 overflow-y-auto pr-2">
+            <div className="space-y-4 max-h-96 overflow-y-auto">
               {villageList.slice().reverse().map((v) => (
                 <div
                   key={v.id}
-                  className="p-4 border border-neutral-200 rounded-2xl hover:shadow-sm transition"
+                  className="flex justify-between items-center p-4 rounded-2xl bg-white shadow-sm border border-slate-100 hover:shadow-md transition"
                 >
-                  <div className="flex justify-between">
-                    <div>
-                      <p className="font-medium text-neutral-900">
-                        {v.name}
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        {v.district}
-                      </p>
-                    </div>
-                    <span className="text-xs px-3 py-1 bg-neutral-100 rounded-full">
-                      {v.riskLevel}
-                    </span>
+                  <div>
+                    <p className="font-medium text-slate-900">
+                      {v.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {v.district}
+                    </p>
                   </div>
+                  <span
+                    className={`px-4 py-1 rounded-full text-xs font-medium ${
+                      v.riskLevel === "CRITICAL"
+                        ? "bg-red-100 text-red-700"
+                        : v.riskLevel === "HIGH"
+                        ? "bg-amber-100 text-amber-700"
+                        : "bg-emerald-100 text-emerald-700"
+                    }`}
+                  >
+                    {v.riskLevel}
+                  </span>
                 </div>
               ))}
             </div>
           )}
         </div>
+
       </div>
 
       {showModal && (
@@ -215,51 +219,47 @@ export default function Dashboard() {
   );
 }
 
+/* KPI CARD */
+function KpiCard({ title, value, icon, accent }) {
+  const accentColors = {
+    blue: "bg-blue-50 text-blue-600",
+    red: "bg-red-50 text-red-600",
+    emerald: "bg-emerald-50 text-emerald-600",
+    amber: "bg-amber-50 text-amber-600",
+  };
 
-/* ---------- Interactive KPI Card ---------- */
-
-function InteractiveCard({ title, value, icon, percentage }) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all group">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-md p-7 hover:shadow-lg transition-all">
 
-      <div className="flex justify-between items-start mb-6">
-        <p className="text-sm text-neutral-500">{title}</p>
-        <div className="text-neutral-400">{icon}</div>
-      </div>
-
-      <div className="text-3xl font-semibold text-neutral-900">
-        {value}
-      </div>
-
-      <div className="mt-6">
-        <div className="w-full bg-neutral-200 rounded-full h-2">
-          <div
-            className="bg-neutral-900 h-2 rounded-full transition-all duration-700"
-            style={{ width: `${percentage}%` }}
-          />
+      <div className="flex justify-between mb-6">
+        <p className="text-sm text-slate-500">{title}</p>
+        <div className={`p-3 rounded-xl ${accentColors[accent]}`}>
+          {icon}
         </div>
+      </div>
+
+      <div className="text-3xl font-semibold text-slate-900">
+        {value}
       </div>
     </div>
   );
 }
 
-
-/* ---------- Progress Component ---------- */
-
-function ProgressBar({ label, value, total }) {
+/* Soft Progress */
+function SoftProgress({ label, value, total, color }) {
   const percent =
     total > 0 ? ((value / total) * 100).toFixed(0) : 0;
 
   return (
-    <div className="mb-6">
-      <div className="flex justify-between text-sm text-neutral-700 mb-2">
+    <div className="mb-8">
+      <div className="flex justify-between text-sm text-slate-600 mb-3">
         <span>{label}</span>
         <span>{value}</span>
       </div>
 
-      <div className="w-full bg-neutral-200 rounded-full h-3">
+      <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
         <div
-          className="bg-neutral-900 h-3 rounded-full transition-all duration-700"
+          className={`${color} h-3 transition-all duration-700`}
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -267,9 +267,7 @@ function ProgressBar({ label, value, total }) {
   );
 }
 
-
-/* ---------- Modal ---------- */
-
+/* Modal */
 function AddVillageModal({
   villageData,
   handleChange,
@@ -278,25 +276,26 @@ function AddVillageModal({
   onClose,
 }) {
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-3xl w-full max-w-md relative shadow-lg">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-xl relative">
 
-        <button onClick={onClose} className="absolute right-5 top-5">
-          <X className="w-5 h-5 text-neutral-500" />
+        <button onClick={onClose} className="absolute right-6 top-6">
+          <X className="w-5 h-5 text-slate-400" />
         </button>
 
-        <h2 className="text-xl font-semibold mb-6 text-neutral-900">
-          Add New Village
+        <h2 className="text-xl font-semibold text-slate-900 mb-6">
+          Add Village
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+
           <input
             type="text"
             name="name"
             placeholder="Village Name"
             value={villageData.name}
             onChange={handleChange}
-            className="w-full border border-neutral-200 rounded-xl px-4 py-2 text-sm"
+            className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-400 outline-none"
             required
           />
 
@@ -306,7 +305,7 @@ function AddVillageModal({
             placeholder="District"
             value={villageData.district}
             onChange={handleChange}
-            className="w-full border border-neutral-200 rounded-xl px-4 py-2 text-sm"
+            className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-400 outline-none"
             required
           />
 
@@ -316,7 +315,7 @@ function AddVillageModal({
             placeholder="Population"
             value={villageData.population}
             onChange={handleChange}
-            className="w-full border border-neutral-200 rounded-xl px-4 py-2 text-sm"
+            className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-400 outline-none"
             required
           />
 
@@ -324,7 +323,7 @@ function AddVillageModal({
             name="riskLevel"
             value={villageData.riskLevel}
             onChange={handleChange}
-            className="w-full border border-neutral-200 rounded-xl px-4 py-2 text-sm"
+            className="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-teal-400 outline-none"
           >
             <option value="LOW">LOW</option>
             <option value="MODERATE">MODERATE</option>
@@ -335,10 +334,11 @@ function AddVillageModal({
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-neutral-900 text-white py-3 rounded-full hover:bg-neutral-800 transition"
+            className="w-full bg-teal-600 text-white py-3 rounded-full hover:bg-teal-700 transition"
           >
             {loading ? "Saving..." : "Save Village"}
           </button>
+
         </form>
       </div>
     </div>
