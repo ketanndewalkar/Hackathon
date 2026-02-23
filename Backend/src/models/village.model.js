@@ -33,6 +33,12 @@ const villageSchema = new mongoose.Schema(
       min: 0
     },
 
+    stressType:{
+      type:String,
+      enum: ["healthy", "moderate", "drought"],
+      default: "healthy"
+    },
+
     lastComputedAt: {
       type: Date
     }
