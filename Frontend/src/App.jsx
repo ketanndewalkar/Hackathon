@@ -13,7 +13,9 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = createBrowserRouter([{
     path:"/",
-    element:<><Home/></>
+    element:<>
+    <Home/>
+    </>
   },{
     path:"/dashboard",
     element:<><Layout/></>,

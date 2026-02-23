@@ -1,127 +1,166 @@
-import { RefreshCcw } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { RefreshCcw, Truck, AlertTriangle, MapPin } from "lucide-react";
+import { useState } from "react";
+
+const STORAGE_KEY = "mock_villages";
 
 export default function TankerAllocation() {
-  const [kpiData, setKpiData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+  const [villages, setVillages] = useState(() => {
     try {
-      setLoading(true);
-
-      const response = await axios.get(
-        "http://localhost:5500/api/tanker-allocation"
-      );
-
-      setKpiData(response.data);
-    } catch (error) {
-      console.error("Error fetching tanker allocation data:", error);
-    } finally {
-      setLoading(false);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
     }
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      setVillages(stored ? JSON.parse(stored) : []);
+      setLoading(false);
+    }, 500);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const requireTanker = villages.filter(
+    (v) => v.riskLevel === "HIGH" || v.riskLevel === "CRITICAL"
+  );
+
+  const availableTankers = 18;
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-neutral-50 p-6 space-y-8">
 
-      {/* Header */}
+      {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Tanker Allocation Control Center
+          <h1 className="text-3xl font-semibold text-neutral-900">
+            Tanker Deployment Operations
           </h1>
-          <p className="text-sm text-gray-500">
-            AI-prioritized water tanker deployment for emerging drought zones.
+          <p className="text-sm text-neutral-500 mt-1">
+            Priority-based water logistics coordination center.
           </p>
         </div>
 
-        <div className="flex gap-3">
-          <select className="border border-gray-200 rounded-lg px-3 py-2 text-sm">
-            <option>All Blocks</option>
-          </select>
+        <button
+          onClick={fetchData}
+          className="flex items-center gap-2 px-4 py-2 bg-neutral-900 text-white rounded-full text-sm shadow-sm hover:bg-neutral-800 transition"
+        >
+          <RefreshCcw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          Sync Allocation Data
+        </button>
+      </div>
 
-          <button
-            onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg text-sm"
-          >
-            <RefreshCcw
-              className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
-            />
-            Refresh Live Data
-          </button>
+      {/* OPERATIONS SUMMARY PANEL */}
+      <div className="bg-white border border-neutral-200 rounded-3xl p-8 shadow-sm">
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <OperationMetric
+            icon={<AlertTriangle />}
+            label="Villages Awaiting Allocation"
+            value={requireTanker.length}
+          />
+
+          <OperationMetric
+            icon={<Truck />}
+            label="Available Tankers"
+            value={availableTankers}
+          />
+
+          <OperationMetric
+            icon={<MapPin />}
+            label="Active Deployments"
+            value={requireTanker.length}
+          />
+
         </div>
+
       </div>
 
-      {/* KPI Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      {/* ALLOCATION WORKFLOW SECTION */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
-        {loading ? (
-          <>
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-          </>
-        ) : (
-          <>
-            <StatCard
-              title="Villages Requiring Tankers"
-              value={kpiData?.villagesRequiring ?? "12"}
-              accent="red"
-            />
-            <StatCard
-              title="High Priority Villages"
-              value={kpiData?.highPriority ?? "5"}
-              accent="red"
-            />
-            <StatCard
-              title="Available Tankers"
-              value={kpiData?.availableTankers ?? "18"}
-              accent="green"
-            />
-            <StatCard
-              title="Active Deployments"
-              value={kpiData?.activeDeployments ?? "7"}
-              accent="blue"
-            />
-          </>
-        )}
-      </div>
+        {/* PRIORITY PIPELINE */}
+        <div className="bg-white border border-neutral-200 rounded-3xl p-6 shadow-sm">
 
-      {/* Table + Smart Engine */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        <div className="xl:col-span-2 bg-white border rounded-xl p-6">
-          <h2 className="font-semibold mb-4">
-            Villages Pending Tanker Allocation
+          <h2 className="text-lg font-medium text-neutral-900 mb-6">
+            Priority Allocation Queue
           </h2>
 
-          {loading ? (
-            <SkeletonBox height="h-72" />
+          {requireTanker.length === 0 ? (
+            <p className="text-sm text-neutral-400">
+              No villages currently require tanker deployment.
+            </p>
           ) : (
-            <div className="h-72 border border-dashed rounded-lg flex items-center justify-center text-gray-400 text-sm">
-              Allocation Table Placeholder
+            <div className="space-y-4">
+
+              {requireTanker.map((v, index) => (
+                <div
+                  key={v.id}
+                  className="flex items-center justify-between p-4 border border-neutral-200 rounded-2xl"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-neutral-900">
+                      {index + 1}. {v.name}
+                    </p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {v.district}
+                    </p>
+                  </div>
+
+                  <span className="text-xs font-medium px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full">
+                    {v.riskLevel}
+                  </span>
+                </div>
+              ))}
+
             </div>
           )}
         </div>
 
-        <div className="bg-white border rounded-xl p-6">
-          <h2 className="font-semibold mb-4">
-            Smart Tanker Assignment Engine
-          </h2>
+        {/* ALLOCATION STATUS PANEL */}
+        <div className="bg-white border border-neutral-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
 
-          {loading ? (
-            <SkeletonBox height="h-64" />
-          ) : (
-            <div className="h-64 border border-dashed rounded-lg flex items-center justify-center text-gray-400 text-sm">
-              Assignment Engine Panel
+          <div>
+            <h2 className="text-lg font-medium text-neutral-900 mb-4">
+              Allocation Assessment
+            </h2>
+
+            <p className="text-sm text-neutral-600 leading-relaxed">
+              Based on current high-risk classifications,{" "}
+              <strong>{requireTanker.length}</strong> villages require
+              operational tanker support. Available fleet capacity stands at{" "}
+              <strong>{availableTankers}</strong> units.
+            </p>
+          </div>
+
+          <div className="mt-6">
+
+            <div className="w-full bg-neutral-200 rounded-full h-2.5">
+              <div
+                className="bg-neutral-900 h-2.5 rounded-full transition-all duration-500"
+                style={{
+                  width:
+                    availableTankers > 0
+                      ? `${Math.min(
+                          (requireTanker.length / availableTankers) * 100,
+                          100
+                        )}%`
+                      : "0%",
+                }}
+              />
             </div>
-          )}
+
+            <p className="text-xs text-neutral-500 mt-3">
+              Fleet utilization projected based on current demand.
+            </p>
+
+          </div>
+
         </div>
 
       </div>
@@ -130,34 +169,19 @@ export default function TankerAllocation() {
   );
 }
 
-function StatCard({ title, value, accent }) {
-  const colors = {
-    red: "border-l-red-500",
-    green: "border-l-green-500",
-    blue: "border-l-blue-500",
-  };
 
+/* SUB COMPONENT */
+
+function OperationMetric({ icon, label, value }) {
   return (
-    <div
-      className={`bg-white border border-gray-200 border-l-4 ${colors[accent]} rounded-xl p-6`}
-    >
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-bold mt-3">{value}</p>
+    <div className="flex items-center justify-between p-6 border border-neutral-200 rounded-2xl bg-neutral-50">
+      <div>
+        <p className="text-xs text-neutral-500">{label}</p>
+        <p className="text-2xl font-semibold text-neutral-900 mt-2">
+          {value}
+        </p>
+      </div>
+      <div className="text-neutral-400">{icon}</div>
     </div>
-  );
-}
-
-function SkeletonCard() {
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-32 mb-4"></div>
-      <div className="h-8 bg-gray-300 rounded w-20"></div>
-    </div>
-  );
-}
-
-function SkeletonBox({ height }) {
-  return (
-    <div className={`bg-gray-100 rounded-lg ${height} animate-pulse`} />
   );
 }
