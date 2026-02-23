@@ -21,13 +21,6 @@ const villageSchema = new mongoose.Schema(
       min: 0
     },
 
-    location: {
-      latitude: { type: Number, required: true },
-      longitude: { type: Number, required: true }
-    },
-
-  
-
     predictedTankers: {
       type: Number,
       default: 0,
