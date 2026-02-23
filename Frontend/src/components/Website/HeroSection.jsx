@@ -101,7 +101,7 @@ export default function HeroSection() {
               ref={(el) => (titleRefs.current[3] = el)}
               className="inline-block bg-lime-400 text-[#0B3D2E] px-6 py-2 rounded-full mt-3"
             >
-              Technology
+              Management
             </div>
           </div>
 
@@ -120,31 +120,7 @@ export default function HeroSection() {
               Explore Dashboard
             </Link>
 
-            <button
-              ref={(el) => (buttonRefs.current[1] = el)}
-              className="
-    flex items-center gap-2
-    text-sm sm:text-base
-    text-gray-200 hover:text-white
-    transition duration-300
-    whitespace-nowrap
-  "
-            >
-              <span>View Forecast Demo</span>
-
-              <span
-                className="
-      border border-gray-400
-      rounded-full
-      px-2 sm:px-3
-      py-0.5
-      text-sm sm:text-lg
-      flex items-center justify-center
-    "
-              >
-                ↗
-              </span>
-            </button>
+            
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import gsap from "gsap";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -50,7 +50,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         transition-transform duration-300
         md:translate-x-0 md:static md:flex md:flex-col`}
       >
+        
         <div className="flex items-center pt-2">
+            <Link to="/" className="pl-5">{"<"}</Link>
         <img
           src="./logo.png"
           alt="Logo"
