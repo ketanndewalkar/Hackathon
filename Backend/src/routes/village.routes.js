@@ -1,9 +1,8 @@
 import express from 'express';
+import { postVillageInfo } from '../controllers/village.controller.js';
 
 const router = express.Router()
 
-router.get('/',(req,res) => {
-    res.status(200).json({message: "Dashboard Route ...."})
-})
+router.post("/village-info",postVillageInfo)
 
 export default router

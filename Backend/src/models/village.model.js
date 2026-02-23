@@ -20,6 +20,11 @@ const villageSchema = new mongoose.Schema(
       required: true,
       min: 0
     },
+    severity:{
+      type:String,
+      enum: ["low", "medium", "high"],
+      required: true
+    },
 
     predictedTankers: {
       type: Number,
@@ -32,7 +37,6 @@ const villageSchema = new mongoose.Schema(
       default: 0,
       min: 0
     },
-
     stressType:{
       type:String,
       enum: ["healthy", "moderate", "drought"],
