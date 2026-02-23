@@ -1,13 +1,15 @@
+import Village from "../models/village.model.js";
+
 export const postVillageInfo = async (req, res) => {
-  const { name, district, population ,severity} = req.body;
-  if (!name || !district || !population || !severity) {
+  const { name, district, population} = req.body;
+  if (!name || !district || !population) {
     return res.status(400).json({ message: "All fields are required" });
   }
   const newVillage = await Village.create({
     name,
     district,
     population,
-    severity
+    
   });
   if(!newVillage){
     return res.status(500).json({ message: "Failed to create village" });
