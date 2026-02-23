@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use(cors())
 
-connectDb();
+connectDb()
 app.get("/health",(req,res) => {
     res.status(200).json({message: "HealthCheck Route ...."})
 })
